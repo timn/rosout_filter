@@ -1,0 +1,13 @@
+<package>
+  <description brief="rosout_filter">
+    Node to filter /rosout_agg by given criteria and write to a new topic.
+  </description>
+  <author>Tim Niemueller</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rosout_filter</url>
+  <depend package="roslib"/>
+  <depend package="roscpp"/>
+</package>
+
+

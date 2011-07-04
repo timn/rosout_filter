@@ -1,0 +1,11 @@
+output-topic: /rosout_filtered
+levels: [DEBUG, INFO, WARN, ERROR, FATAL]
+default: exclude
+---
+- type: exclude
+  levels: [DEBUG, INFO, WARN, ERROR, FATAL]
+  nodename: /test
+- type: include
+  regex: ^std.*
+- type: exclude
+  nodename: /tf
