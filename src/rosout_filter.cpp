@@ -90,6 +90,17 @@ ROSoutFilter::filtered(const LOG_MSGTYPE::ConstPtr &msg) const
     if ((f->flags & FILTER_FOR_NODENAME) && (f->nodename != msg->name)) {
       matched = false;
     }
+    if (f->flags & FILTER_FOR_NODENAMES) {
+      bool matched_any = false;
+      for (unsigned int i = 0; i < f->nodenames_size; ++i) {
+	if (f->nodenames[i] == msg->name) {
+	  matched_any = true;
+	  break;
+	}
+      }
+      if (! matched_any)  matched = false;
+    }
+
 #ifdef USE_REGEX_CPP
     if ((f->flags & FILTER_FOR_REGEX) && ! regex_search(msg->msg, f->regex)) {
 #else
@@ -137,6 +148,21 @@ ROSoutFilter::read_config_levels(const YAML::Node &n)
   }
 
   return levels;
+}
+
+
+std::vector<std::string>
+ROSoutFilter::read_config_nodenames(const YAML::Node &n)
+{
+  std::vector<std::string> nodenames;
+
+  for (unsigned int i = 0; i < n.size(); ++i) {
+    std::string nodename;
+    n[i] >> nodename;
+    nodenames.push_back(nodename);
+  }
+
+  return nodenames;
 }
 
 void
@@ -229,6 +255,12 @@ ROSoutFilter::read_config()
       fc.flags |= FILTER_FOR_LEVELS;
     } catch (YAML::KeyNotFound &e) {} // ignored
 
+    try {
+      fc.nodenames = read_config_nodenames(c["nodenames"]);
+      fc.nodenames_size = fc.nodenames.size();
+      fc.flags |= FILTER_FOR_NODENAMES;
+    } catch (YAML::KeyNotFound &e) {} // ignored
+
     __filters.push_back(fc);
   }
 }
@@ -256,6 +288,14 @@ ROSoutFilter::print_config()
     }
     if (f->flags & FILTER_FOR_LEVELS) {
       printf("  Levels:    %u\n", f->levels);
+    }
+    if (f->flags & FILTER_FOR_NODENAMES) {
+      printf("  Nodenames: ");
+      const unsigned int last = f->nodenames.size();
+      for (unsigned int i = 0; i < last; ++i) {
+	printf("%s%s", f->nodenames[i].c_str(), (i == last - 1) ? "" : ", ");
+      }
+      printf("\n");
     }
     printf("\n");
   }

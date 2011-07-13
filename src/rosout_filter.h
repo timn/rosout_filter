@@ -53,8 +53,9 @@ class ROSoutFilter
 
   typedef enum {
     FILTER_FOR_NODENAME    =  1,
-    FILTER_FOR_LEVELS      =  2,
-    FILTER_FOR_REGEX       =  4,
+    FILTER_FOR_NODENAMES   =  2,
+    FILTER_FOR_LEVELS      =  4,
+    FILTER_FOR_REGEX       =  8,
   } FilterFlags;
 
   ROSoutFilter(ros::NodeHandle &nh, std::string &config_file, bool verbose = false);
@@ -64,6 +65,7 @@ class ROSoutFilter
   void logmsg_cb(const LOG_MSGTYPE::ConstPtr &msg);
   void read_config();
   uint8_t read_config_levels(const YAML::Node &n);
+  std::vector<std::string> read_config_nodenames(const YAML::Node &n);
 
   void print_config();
 
@@ -83,15 +85,17 @@ class ROSoutFilter
   uint8_t      __levels;
 
   typedef struct {
-    FilterType  type;
-    FilterFlags flags;
-    std::string nodename;
-    uint8_t     levels;
-    std::string regex_str;
+    FilterType                type;
+    FilterFlags               flags;
+    std::string               nodename;
+    std::vector<std::string>  nodenames;
+    unsigned int              nodenames_size;
+    uint8_t                   levels;
+    std::string               regex_str;
 #ifdef USE_REGEX_CPP
-    std::regex  regex;
+    std::regex                regex;
 #else
-    regex_t     regex;
+    regex_t                   regex;
 #endif
   } FilterConfig;
 

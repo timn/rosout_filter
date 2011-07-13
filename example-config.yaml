@@ -9,3 +9,5 @@ default: exclude
   regex: ^std.*
 - type: exclude
   nodename: /tf
+- type: include
+  nodenames: [/talkerpub, /talkersub]
