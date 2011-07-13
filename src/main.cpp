@@ -25,13 +25,62 @@
 #include "rosout_filter.h"
 #include <ros/ros.h>
 
+#include <unistd.h>
+
+
+void
+usage(const char *progname, const char *additional = 0)
+{
+  printf("Usage: %s [config_file]\n\n%s", progname,
+	 additional ? additional : "");
+}
+
 int
 main(int argc, char **argv)
 {
-  ros::init(argc, argv, "rosspawn");
+  ros::init(argc, argv, "rosout_filter");
   ros::NodeHandle n;
- 
-  ROSoutFilter rosout_filter(n, true);
+
+  std::string config_file;
+
+  bool show_help = false;
+  bool verbose = false;
+  bool unknown_arg = false;
+  int c;
+  while ((c = getopt(argc, argv, "dh")) != -1) {
+    if (c == '?') {
+      unknown_arg = true;
+    } else if (c == 'd') {
+      verbose = true;
+    } else if (c == 'h') {
+      show_help = true;
+    }
+  }
+
+  if (show_help) {
+    usage(argv[0]);
+    exit(0);
+  }
+  if (unknown_arg) {
+    usage(argv[0], "Unknown argument\n");
+    exit(-1);
+  }
+
+  int ind = optind;
+  if (ind < argc) {
+    config_file = argv[ind];
+  } else if (n.hasParam("/rosout_filter/config_file")) {
+    n.getParam("/rosout_filter/config_file", config_file);
+  }
+
+  if (config_file == "") {
+    usage(argv[0],
+	  "Cannot determine configuration file. Either pass as command line\n"
+	  "parameter or set /rosout_filter/config_file parameter.\n");
+    exit(-2);
+  }
+
+  ROSoutFilter rosout_filter(n, config_file, verbose);
 
   ros::spin();
 }

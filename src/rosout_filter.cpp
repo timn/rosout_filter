@@ -49,8 +49,9 @@ inline ROSoutFilter::FilterFlags operator&(ROSoutFilter::FilterFlags a, int b)
   return ROSoutFilter::FilterFlags(int(a) & b);
 }
 
-ROSoutFilter::ROSoutFilter(ros::NodeHandle &nh, bool verbose)
-  : __nh(nh), __verbose(verbose)
+ROSoutFilter::ROSoutFilter(ros::NodeHandle &nh,
+			   std::string &config_file, bool verbose)
+  : __nh(nh), __config_file(config_file), __verbose(verbose)
 {
   __sub_rosout = __nh.subscribe("/rosout_agg", 10,
 				&ROSoutFilter::logmsg_cb, this);
@@ -141,7 +142,7 @@ ROSoutFilter::read_config_levels(const YAML::Node &n)
 void
 ROSoutFilter::read_config()
 {
-  std::ifstream fin("example-config.yaml");
+  std::ifstream fin(__config_file);
   YAML::Parser parser(fin);
 
   YAML::Node general_doc;

@@ -57,7 +57,7 @@ class ROSoutFilter
     FILTER_FOR_REGEX       =  4,
   } FilterFlags;
 
-  ROSoutFilter(ros::NodeHandle &nh, bool verbose = false);
+  ROSoutFilter(ros::NodeHandle &nh, std::string &config_file, bool verbose = false);
   ~ROSoutFilter();
 
  private:  
@@ -71,6 +71,7 @@ class ROSoutFilter
 
  private:
   ros::NodeHandle __nh;
+  std::string     __config_file;
   bool            __verbose;
 
   ros::Subscriber __sub_rosout;
