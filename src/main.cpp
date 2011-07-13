@@ -40,6 +40,7 @@ main(int argc, char **argv)
 {
   ros::init(argc, argv, "rosout_filter");
   ros::NodeHandle n;
+  ros::NodeHandle priv_n("~");
 
   std::string config_file;
 
@@ -69,14 +70,17 @@ main(int argc, char **argv)
   int ind = optind;
   if (ind < argc) {
     config_file = argv[ind];
-  } else if (n.hasParam("/rosout_filter/config_file")) {
-    n.getParam("/rosout_filter/config_file", config_file);
+  } else if (priv_n.hasParam("config_file")) {
+    priv_n.getParam("config_file", config_file);
+  }
+  if (priv_n.hasParam("verbose")) {
+    priv_n.getParam("verbose", verbose);
   }
 
   if (config_file == "") {
     usage(argv[0],
 	  "Cannot determine configuration file. Either pass as command line\n"
-	  "parameter or set /rosout_filter/config_file parameter.\n");
+	  "parameter or set config_file parameter.\n");
     exit(-2);
   }
 
