@@ -8,6 +8,7 @@
   <url>http://ros.org/wiki/rosout_filter</url>
   <depend package="roslib"/>
   <depend package="roscpp"/>
+  <rosdep name="yaml-cpp"/>
 </package>
 
 

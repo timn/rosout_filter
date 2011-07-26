@@ -1,0 +1,59 @@
+
+rosout_filter: ROS log out put filtering node
+=============================================================================
+
+This package contains the rosout_filter node. This nodes reads input from a
+rosout logging topic (normally /rosout_agg), passes it through a configurable
+chain of filters, and outputs the included messages to another rosout topic
+(usually /rosout_filtered).
+
+Requirements
+------------
+The package requires ROS and yaml-cpp to configure the filter chains.
+
+Configuration
+-------------
+The node is configured by a YAML file [1]. The file consists of two documents.
+The first document contains the general and default configuration values. The
+second document defines the filtering chain. In the following we describe the
+valid configuration entries.
+
+The General Configuration can contain the following fields:
+input-topic (default: /rosout_agg)
+  Topic of the rosout logging type to read log messages from.
+output-topic (default: /rosout_filtered)
+  Topic to write messages to that pass through the filters.
+levels (default: [DEBUG, INFO, WARN, ERROR, FATAL])
+  Log-levels to include by default
+default (default: include)
+  Default filter type, either include or exclude. If the message is neither
+  accepted nor rejected by a filter this default action applies.
+
+The configuration chain contains one or more filter elements. The elements
+can either include or exclude a log message from forwarding. The order of
+filters is important, the first one that matches is used and the message is
+either included or not, no matter what later rules might state. If a filter
+does not apply, the message is passed to the next filter. If no filter
+applies, the default type configured in the general section is used. A filter
+contains of one or more matchers. The matchers per chain are connected with
+a logical "and", meaning that all matchers must apply to consider the filter
+as matcher. To create a logical "or" use multiple filter entries. The
+following values are possible (entries have no default values!):
+type (must be present)
+  Type of the filter result, either include or exclude
+levels
+  Matcher with a list of log levels for which the filter applies.
+nodename
+  Matcher for name of the sending node.
+nodenames
+  Matcher for list of names of which any can match to a sending node name.
+regex
+  Regular expression applied to the message. May contain extended regular
+  expressions as known from C.
+
+For an example see example-config.yaml.
+
+References
+----------
+[1] http://yaml.org/
+
